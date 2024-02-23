@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 """ Place module"""
+
+import models
 from sqlalchemy.ext.declarative import declarative_base
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, Table, String, Integer, Float, ForeignKey
 from sqlalchemy.orm import relationship
 from os import getenv
-import models
 
 
 place_amenity = Table("place_amenity", Base.metadata,
@@ -50,7 +51,7 @@ class Place(BaseModel, Base):
             result = []
             for key in var:
                 review = key.replace('.', ' ')
-                review = shlex.split(review)
+                #review = shlex.split(review)
                 if (review[0] == 'Review'):
                     lista.append(var[key])
             for elem in lista:
@@ -66,5 +67,5 @@ class Place(BaseModel, Base):
         @amenities.setter
         def amenities(self, obj=None):
             """ amenity ids/attribute """
-            if type(obj) is Amenity and obj.id not in self.amenity_ids:
-                self.amenity_ids.append(obj.id)
+            #if type(obj) is Amenity and obj.id not in self.amenity_ids:
+                #self.amenity_ids.append(obj.id)
