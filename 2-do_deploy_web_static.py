@@ -41,7 +41,7 @@ def do_deploy(archive_path):
     if run('rm -rf /data/web_static/current/').failed is True:
         return False
 
-    if run('ln -s {}{} {}'.format(fDir, file, current)).failed is True:
+    if run('ln -s {}{}/ {}'.format(fDir, file, current)).failed is True:
         return False
 
     return True
