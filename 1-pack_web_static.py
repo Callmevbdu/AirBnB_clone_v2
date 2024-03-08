@@ -13,16 +13,13 @@ def do_pack():
     """
 
     now = datetime.now()
-    timestamp = now.strftime("%Y%m%d_%H%M%S")
-
-    archive_name = f"web_static_{timestamp}.tgz"
-    archive_path = os.path.join("versions", archive_name)
+    form = 'web_static_' + now.strftime("%Y%m%d%H%M%S") + '.' + 'tgz'
 
     local('mkdir -p versions')
 
-    archive = local("tar -czvf {archive_path} web_static/")
+    tgz = local("tar -czvf versions/{} web_static/".format(form))
 
-    if archive is not None:
-        return archive_path
+    if tgz is not None:
+        return form
     else:
         return None
