@@ -1,9 +1,10 @@
 #!/usr/bin/python3
-# Upload an archive to the web server.
-
+"""
+a Fabric script (based on the file 1-pack_web_static.py) that distributes an
+archive to your web servers, using the function do_deploy
+"""
 from fabric.api import put, run, env
-from fabric.contrib.files import exists
-from os.path import basename, join
+from os.path import exists
 
 env.hosts = ['54.221.13.125', '52.91.117.179']
 
@@ -16,7 +17,6 @@ def do_deploy(archive_path):
     if not exists(archive_path):
         print(f"Archive not found: {archive_path}")
         return False
-
     try:
         put(archive_path, '/tmp/')
 
