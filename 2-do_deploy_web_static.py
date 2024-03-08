@@ -1,48 +1,38 @@
 #!/usr/bin/python3
 # Upload an archive to the web server.
-import os.path
-from fabric.api import env
-from fabric.api import put
-from fabric.api import run
 
-env.hosts = ["104.196.168.90", "35.196.46.172"]
+from fabric.api import put, run, env
+from fabric.contrib.files import exists
+from os.path import basename, join
+
+env.hosts = ['54.221.13.125', '52.91.117.179']
 
 
 def do_deploy(archive_path):
-    """ Deploy an archive to a web server
-    Arguments:
-        archive_path (str): The path of the archive to distribute
-    Return:
-        Error occurs (False), otherwise (True)
+    """
+    Deploys the archive to web servers.
     """
 
-    if os.path.isfile(archive_path) is False:
+    if not exists(archive_path):
+        print(f"Archive not found: {archive_path}")
         return False
-    file = archive_path.split("/")[-1]
-    name = file.split(".")[0]
 
-    if put(archive_path, "/tmp/{}".format(file)).failed is True:
+    try:
+        put(archive_path, '/tmp/')
+
+        archive_filename = basename(archive_path)
+
+        release_dir = join(
+                "/data/web_static/releases",
+                archive_filename.split('.')[0])
+        run(f"mkdir -p {release_dir}")
+        run(f"tar -xzf /tmp/{archive_filename} -C {release_dir}")
+
+        run(f"rm /tmp/{archive_filename}")
+        run(f"rm -rf /data/web_static/current")
+        run(f"ln -s {release_dir} /data/web_static/current")
+
+        return True
+    except Exception as e:
+        print(f"An error occurred during deployment: {e}")
         return False
-    if run("rm -rf /data/web_static/releases/{}/".
-           format(name)).failed is True:
-        return False
-    if run("mkdir -p /data/web_static/releases/{}/".
-           format(name)).failed is True:
-        return False
-    if run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/".
-           format(file, name)).failed is True:
-        return False
-    if run("rm /tmp/{}".format(file)).failed is True:
-        return False
-    if run("mv /data/web_static/releases/{}/web_static/* "
-           "/data/web_static/releases/{}/".format(name, name)).failed is True:
-        return False
-    if run("rm -rf /data/web_static/releases/{}/web_static".
-           format(name)).failed is True:
-        return False
-    if run("rm -rf /data/web_static/current").failed is True:
-        return False
-    if run("ln -s /data/web_static/releases/{}/ /data/web_static/current".
-           format(name)).failed is True:
-        return False
-    return True
