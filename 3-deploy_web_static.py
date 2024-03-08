@@ -2,12 +2,9 @@
 # Create and deploy an archive to the web server
 import os.path
 from datetime import datetime
-from fabric.api import env
-from fabric.api import local
-from fabric.api import put
-from fabric.api import run
+from fabric.api import env, local, put, run
 
-env.hosts = ["104.196.168.90", "35.196.46.172"]
+env.hosts = ["54.221.13.125", "52.91.117.179"]
 
 
 def do_pack():
