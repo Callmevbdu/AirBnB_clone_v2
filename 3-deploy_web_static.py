@@ -1,5 +1,8 @@
 #!/usr/bin/python3
-# Create and deploy an archive to the web server
+"""
+ Fabric script that creates and distributes an archive to your web servers,
+ using the function deploy.
+"""
 import os.path
 from datetime import datetime
 from fabric.api import env, local, put, run
