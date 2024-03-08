@@ -7,15 +7,21 @@ env.hosts = ['54.221.13.125', '52.91.117.179']
 
 
 def do_deploy(archive_path):
-    """
-    Deploys the archive to web servers.
+
+    """Distributes an archive to a web server.
+
+    Args:
+        archive_path (str): The path of the archive to distribute.
+    Returns:
+        Error occurs - False.
+        Otherwise - True.
     """
     if os.path.isfile(archive_path) is False:
         return False
     fName = archive_path.split("/")[-1]
     file = fName.split(".")[0]
     fDir = "/data/web_static/releases/"
-    current = "/data/web_static/current/"
+    current = "/data/web_static/current"
     if put(archive_path, "/tmp/{}".format(fName)).failed is True:
         return False
 
@@ -38,7 +44,8 @@ def do_deploy(archive_path):
 
     if run('rm -rf {}{}/web_static'.format(fDir, file)).failed is True:
         return False
-    if run('rm -rf /data/web_static/current/').failed is True:
+
+    if run('rm -rf /data/web_static/current').failed is True:
         return False
 
     if run('ln -s {}{}/ {}'.format(fDir, file, current)).failed is True:
