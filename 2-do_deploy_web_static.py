@@ -1,8 +1,5 @@
 #!/usr/bin/python3
-"""
-a Fabric script (based on the file 1-pack_web_static.py) that distributes an
-archive to your web servers, using the function do_deploy
-"""
+# a Fabric script that distributes an archive to your web server
 from fabric.api import put, run, env
 import os.path
 
@@ -18,19 +15,33 @@ def do_deploy(archive_path):
     fName = archive_path.split("/")[-1]
     file = fName.split(".")[0]
     fDir = "/data/web_static/releases/"
-    try:
-        put(archive_path, "/tmp/{}".format(fName))
-
-        run("rm -rf {}{}/".format(fDir, file))
-        run("mkdir -p {}{}/".format(fDir, file))
-        run("tar -xzf /tmp/{} -C {}{}/".format(fName, fDir, file))
-        run("rm /tmp/{}".format(fName))
-        run("mv /data/web_static/releases/{}/web_static/* "
-                "/data/web_static/releases/{}/".format(file, file))
-        run('rm -rf {}{}/web_static'.format(fDir, file))
-        run('rm -rf /data/web_static/current')
-        run('ln -s {}{}/ /data/web_static/current'.format(fDir, file))
-        return True
-    except Exception as e:
-        print e
+    current = "/data/web_static/current"
+    if put(archive_path, "/tmp/{}".format(fName)).failed is True:
         return False
+
+    if run("rm -rf {}{}/".format(fDir, file)).failed is True:
+        return False
+
+    if run("mkdir -p {}{}/".format(fDir, file)).failed is True:
+        return False
+
+    if run("tar -xzf /tmp/{} -C {}{}/".
+            format(fName, fDir, file)).failed is True:
+        return False
+
+    if run("rm /tmp/{}".format(fName)).failed is True:
+        return False
+
+    if run("mv {}{}/web_static/* {}{}/"
+            .format(fDir, file, fDir, file)).failed is True:
+        return False
+
+    if run('rm -rf {}{}/web_static'.format(fDir, file)).failed is True:
+        return False
+    if run('rm -rf /data/web_static/current').failed is True:
+        return False
+
+    if run('ln -s {}{}/ {}'.format(fDir, file, current)).failed is True:
+        return False
+
+    return True
