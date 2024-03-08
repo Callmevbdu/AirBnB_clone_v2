@@ -18,20 +18,19 @@ def do_deploy(archive_path):
         print(f"Archive not found: {archive_path}")
         return False
     try:
+        fileName = archive_path.split("/")[-1]
+        ext = fileName.split(".")[0]
+        releasedir = "/data/web_static/releases/"
         put(archive_path, '/tmp/')
 
-        archive_filename = basename(archive_path)
+        run("mkdir -p {}{}/".format(releasedir, ext))
+        run("tar -xzf /tmp/{} -C {}{}/".format(fileName, releasedir, ext))
 
-        release_dir = join(
-                "/data/web_static/releases",
-                archive_filename.split('.')[0])
-        run(f"mkdir -p {release_dir}")
-        run(f"tar -xzf /tmp/{archive_filename} -C {release_dir}")
-
-        run(f"rm /tmp/{archive_filename}")
-        run(f"rm -rf /data/web_static/current")
-        run(f"ln -s {release_dir} /data/web_static/current")
-
+        run("rm /tmp/{fileName}")
+        run('mv {0}{1}/web_static/* {0}{1}/'.format(releasedir, ext))
+        run('rm -rf {}{}/web_static'.format(releasedir, ext))
+        run('rm -rf /data/web_static/current')
+        run('ln -s {}{}/ /data/web_static/current'.format(releasedir, ext))
         return True
     except Exception as e:
         print(f"An error occurred during deployment: {e}")
